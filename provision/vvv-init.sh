@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Provision WordPress Stable
 
 # Make a database, if we don't already have one
@@ -7,22 +8,20 @@ mysql -u root --password=root -e "GRANT ALL PRIVILEGES ON wordpress_default.* TO
 echo -e "\n DB operations done.\n\n"
 
 # Nginx Logs
-if [[ ! -d /srv/log/wordpress-default ]]; then
-    mkdir -p /srv/log/wordpress-default
-fi
-    touch /srv/log/wordpress-default/error.log
-    touch /srv/log/wordpress-default/access.log
+mkdir -p ${VVV_PATH_TO_SITE}/log
+touch ${VVV_PATH_TO_SITE}/log/error.log
+touch ${VVV_PATH_TO_SITE}/log/access.log
 
 # Install and configure the latest stable version of WordPress
-if [[ ! -d "/srv/www/wordpress-default" ]]; then
+if [[ ! -d "${VVV_PATH_TO_SITE}/public_html" ]]; then
 
   echo "Downloading WordPress Stable, see http://wordpress.org/"
-  cd /srv/www/
+  cd ${VVV_PATH_TO_SITE}
   curl -L -O "https://wordpress.org/latest.tar.gz"
   noroot tar -xvf latest.tar.gz
-  mv wordpress wordpress-default
+  mv wordpress public_html
   rm latest.tar.gz
-  cd /srv/www/wordpress-default
+  cd ${VVV_PATH_TO_SITE}/public_html
 
   echo "Configuring WordPress Stable..."
   noroot wp core config --dbname=wordpress_default --dbuser=wp --dbpass=wp --quiet --extra-php <<PHP
@@ -41,7 +40,7 @@ PHP
 else
 
   echo "Updating WordPress Stable..."
-  cd /srv/www/wordpress-default
+  cd ${VVV_PATH_TO_SITE}/public_html
   noroot wp core update
 
 fi
